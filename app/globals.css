@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* LIGHT (default). .light-scope forces light inside dark mode (used for invoices). */
+  :root,
+  .light-scope {
+    --canvas: 255 255 255;
+    --surface: 255 255 255;
+    --ink: 18 24 29;
+    --hivis: 212 79 10;
+    --hivis-dark: 172 60 4;
+    --hivis-soft: 253 238 229;
+    --on-hivis: 255 255 255;
+    --ok: 22 122 74;
+    --ok-soft: 224 243 233;
+    --spark: 220 40 100;
+    --soft-a: #fff3ea;
+    --soft-b: #fdeaf1;
+    --wash:
+      radial-gradient(60% 50% at 0% 0%, rgba(255, 150, 90, 0.18), transparent 70%),
+      radial-gradient(50% 45% at 100% 0%, rgba(232, 54, 109, 0.12), transparent 70%),
+      radial-gradient(60% 40% at 50% 105%, rgba(124, 58, 237, 0.07), transparent 70%);
+    color-scheme: light;
+  }
+
+  :root[data-theme="dark"] {
+    --canvas: 10 13 19;
+    --surface: 18 23 34;
+    --ink: 232 236 242;
+    --hivis: 255 128 70;
+    --hivis-dark: 255 168 120;
+    --hivis-soft: 58 32 24;
+    --on-hivis: 22 14 10;
+    --ok: 74 222 148;
+    --ok-soft: 17 50 37;
+    --spark: 255 105 145;
+    --soft-a: rgba(255, 128, 70, 0.1);
+    --soft-b: rgba(232, 54, 109, 0.1);
+    --wash:
+      radial-gradient(60% 50% at 8% -5%, rgba(124, 58, 237, 0.32), transparent 70%),
+      radial-gradient(50% 45% at 100% 0%, rgba(232, 54, 109, 0.22), transparent 70%),
+      radial-gradient(60% 45% at 50% 110%, rgba(228, 89, 15, 0.16), transparent 70%);
+    color-scheme: dark;
+  }
+
+  body {
+    @apply text-ink antialiased;
+    background-color: rgb(var(--canvas));
+    background-image: var(--wash);
+    background-attachment: fixed;
+    font-feature-settings: "ss01", "cv11";
+  }
+  /* faint dot grid that fades out toward the bottom of the screen */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: radial-gradient(rgb(var(--ink) / 0.12) 1px, transparent 1.3px);
+    background-size: 24px 24px;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.3) 55%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.3) 55%, transparent 100%);
+  }
+  :focus-visible { @apply outline-2 outline-offset-2 outline-hivis; }
+}
+
+@layer components {
+  .tnum { font-variant-numeric: tabular-nums; }
+
+  .grad-soft { background-image: linear-gradient(135deg, var(--soft-a), var(--soft-b)); }
+  .grad-hero {
+    background:
+      radial-gradient(120% 140% at 100% 0%, rgba(232, 54, 109, 0.55) 0%, rgba(232, 54, 109, 0) 55%),
+      radial-gradient(90% 120% at 0% 100%, rgba(228, 89, 15, 0.5) 0%, rgba(228, 89, 15, 0) 55%),
+      linear-gradient(135deg, #1b1033 0%, #12181d 100%);
+  }
+
+  .input { @apply w-full rounded-lg border border-ink/15 bg-surface px-3.5 py-2.5 text-sm placeholder:text-ink/35 focus:border-hivis focus:outline-none focus:ring-4 focus:ring-hivis/15; }
+  .label { @apply mb-1.5 block text-xs font-medium text-ink/55; }
+
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-lg bg-ink px-4 py-2.5 text-sm font-semibold text-canvas transition hover:bg-ink/85 disabled:opacity-60; }
+  .btn-accent { @apply inline-flex items-center justify-center gap-2 rounded-lg bg-hivis px-4 py-2.5 text-sm font-semibold text-on-hivis transition hover:bg-hivis-dark disabled:opacity-60; }
+  .btn-quiet { @apply inline-flex items-center justify-center rounded-lg border border-ink/15 bg-surface px-3.5 py-1.5 text-sm font-medium hover:bg-ink/5 disabled:opacity-60; }
+
+  .panel {
+    @apply rounded-2xl bg-surface p-6 ring-1 ring-ink/10;
+    box-shadow: 0 1px 2px rgb(var(--ink) / 0.04);
+  }
+  .chip { @apply inline-flex items-center gap-1.5 rounded-md bg-ink/6 px-2 py-0.5 text-xs font-medium text-ink/70; }
+
+  .tab { @apply shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium text-ink/60 hover:bg-ink/5 hover:text-ink; }
+  .tab-on { @apply bg-ink text-canvas hover:bg-ink hover:text-canvas; }
+}
+
+.keep-colors { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+@media print {
+  /* printouts are always light, even if the screen is dark */
+  :root[data-theme="dark"] {
+    --canvas: 255 255 255; --surface: 255 255 255; --ink: 18 24 29;
+    --hivis: 212 79 10; --hivis-dark: 172 60 4; --hivis-soft: 253 238 229; --on-hivis: 255 255 255;
+    --ok: 22 122 74; --ok-soft: 224 243 233; --spark: 220 40 100;
+    --soft-a: #fff3ea; --soft-b: #fdeaf1; --wash: none;
+  }
+  body { background-image: none !important; }
+  body::before { display: none; }
+  .panel { box-shadow: none; }
+}
