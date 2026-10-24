@@ -25,7 +25,7 @@ function Switch({ on, onChange, label, hint }: { on: boolean; onChange: (v: bool
 }
 
 export default function Settings() {
-  const { data, ready, rate, rateBusy, refreshRate, setRateMode, setManualRate, setBudget, setBigExpense, setPrefs, clearAll } = useStore();
+  const { data, ready, rate, rateBusy, refreshRate, setRateMode, setManualRate, setBudget, setBigExpense, setPrefs, clearAll, user, signOut, hasLocal, importLocal } = useStore();
   const [manual, setManual] = useState("");
   useEffect(() => {
     if (ready) setManual(String(data.manualRate));
@@ -149,12 +149,23 @@ export default function Settings() {
         </p>
       </section>
 
+            <section className="panel">
+        <h2 className="font-semibold">Account</h2>
+        <p className="mt-1 text-sm text-ink/55">Signed in as {user?.email}</p>
+        <button className="btn-quiet mt-4" onClick={() => signOut()}>Sign out</button>
+      </section>
+
       <section className="panel">
         <h2 className="font-semibold">Your data</h2>
-        <p className="mt-1 text-sm text-ink/55">Everything is stored in this browser for now. Receipt photos stay on this device and are not in the backup file.</p>
+        <p className="mt-1 text-sm text-ink/55">Everything is saved in Firebase and shared between the owner and the manager. The backup file does not include receipt photos.</p>
         <div className="mt-4 flex flex-wrap gap-3">
           <button className="btn-quiet gap-2" onClick={backup}><Icon name="download" size={15} /> Download backup</button>
-          <button className="btn-quiet" onClick={() => confirm("Delete all invoices and expenses?") && clearAll()}>Clear sample data</button>
+          {hasLocal && (
+            <button className="btn-quiet" onClick={async () => { if (confirm("Copy the invoices and expenses saved in this browser into Firebase?")) alert(`Copied ${await importLocal()} records.`); }}>
+              Import from this browser
+            </button>
+          )}
+          <button className="btn-quiet" onClick={() => confirm("Delete ALL invoices and expenses for everyone? This cannot be undone.") && clearAll()}>Delete all invoices and expenses</button>
         </div>
       </section>
     </div>

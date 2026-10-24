@@ -3,6 +3,7 @@ import "@fontsource-variable/figtree";
 import "./globals.css";
 import { StoreProvider } from "@/lib/store";
 import Shell from "@/components/Shell";
+import AuthGate from "@/components/AuthGate";
 import { BRAND } from "@/lib/brand";
 
 export const metadata: Metadata = { title: BRAND.name, description: BRAND.tagline };
@@ -17,7 +18,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <StoreProvider>
-          <Shell>{children}</Shell>
+          <AuthGate>
+            <Shell>{children}</Shell>
+          </AuthGate>
         </StoreProvider>
       </body>
     </html>

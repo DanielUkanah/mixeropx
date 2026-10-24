@@ -30,20 +30,22 @@ function Page() {
   const fuelCost = list.filter((e) => e.litres).reduce((s, e) => s + val(e), 0);
   const biggest = CATEGORIES.map((c) => ({ c, v: all.filter((e) => e.category === c).reduce((s, e) => s + val(e), 0) })).sort((a, b) => b.v - a.v)[0];
 
-  const save = async (ev: React.FormEvent) => {
+   const save = async (ev: React.FormEvent) => {
     ev.preventDefault();
     setBusy(true);
     const files: FileMeta[] = [];
-    try {
-      for (const f of pending) {
+    let failed = 0;
+    for (const f of pending) {
+      try {
         const blob = await shrink(f);
         const id = uid();
         await putFile(id, { name: f.name, type: blob.type || f.type, blob });
         files.push({ id, name: f.name, type: blob.type || f.type });
+      } catch {
+        failed++;
       }
-    } catch {
-      alert("The receipt couldn't be saved on this device. The expense itself was still saved.");
     }
+    if (failed) alert(`${failed} file${failed > 1 ? "s" : ""} couldn't be saved (PDFs must be under about 700 KB). The expense itself was saved.`);
     addExpense({ date, category, note, site, amount: Number(amount), litres: category === "Fuel" && litres ? Number(litres) : undefined, files });
     setNote(""); setAmount(""); setLitres(""); setPending([]); setBusy(false); setOpen(false);
   };
