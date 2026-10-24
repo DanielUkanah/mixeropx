@@ -10,12 +10,13 @@ export default function Login() {
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const go = async (e: React.FormEvent) => {
+    const go = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
     setErr("");
     try {
-      await signIn(email.trim(), pw);
+      const id = email.trim().toLowerCase();
+      await signIn(id.includes("@") ? id : `${id}@mixeropx.com`, pw);
     } catch {
       setErr("That email or password isn't right.");
     }
